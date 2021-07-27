@@ -80,6 +80,25 @@ def QuestionOne(con):
     question_one_df.to_csv('question_one_output.csv', index=False)
 
 
+def Question2_StudentsPerMajor(con):
+    SQL = """select m.id, m.major_name, count(*) from student s
+    left join student_major sm on s.id = sm.student_id
+    left join major m on m.id = sm.major_id
+    group by  m.id"""
+
+    question_two_df = pd.read_sql_query(SQL, con)
+
+def Question2_StudentsPerDepartment(con):
+
+    SQL = """select d.id, d.department_name, count(*) from student s
+    left join student_major sm on s.id = sm.student_id
+    left join major m on m.id = sm.major_id
+    left join department d on d.id = m.department_id
+    group by  d.id
+    """
+
+    question_two_df = pd.read_sql_query(SQL, con)
+
 def main():
     con = sqlite3.connect("student_major.db")
 
