@@ -1,0 +1,21 @@
+kristina:
+  StudentID: 7
+  FirstName: 'Kristina'
+  LastName: 'Garcia'
+  DOB: '1993-10-08'  # %Y-%m-%d
+
+marco:
+  StudentID: 8
+  FirstName: 'Marco'
+  LastName: 'Lugo'
+  DOB: '1990-04-30'  # %Y-%m-%d
+
+kathy:
+  StudentID: 9
+  FirstName: 'Kathy'
+  LastName: 'Garcia'
+  DOB: '1996-12-02'  # %Y-%m-%d
+
+
+
+
