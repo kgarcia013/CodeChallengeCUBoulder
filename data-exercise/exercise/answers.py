@@ -56,6 +56,30 @@ def InsertNewStudentRecord(newstudents, con):
 
         con.commit()
 
+
+def QuestionOne(con):
+    """
+    This is the solution to question one.
+
+    It grabs the query from sqlite, stores the output into a pandas DataFrame and stores it in a csv
+
+    question_one_output.csv
+
+    :param con:
+    :return:
+    """
+
+    SQL ="""select first_name, last_name, m.major_name, d.department_name department from student s
+    join student_major sm on s.id = sm.student_id
+    join major m on m.id = sm.major_id
+    join department d on d.id = m.department_id
+    where department_name in ('Engineering', 'Language Arts')
+    order by last_name"""
+
+    question_one_df = pd.read_sql_query(SQL, con)
+    question_one_df.to_csv('question_one_output.csv', index=False)
+
+
 def main():
     con = sqlite3.connect("student_major.db")
 
@@ -65,6 +89,7 @@ def main():
     # newstudents = yaml.load(open('.\\newstudent.yaml', 'r'))
     # InsertNewStudentRecord(newstudents, con)
 
+    QuestionOne(con)
 
 
 
