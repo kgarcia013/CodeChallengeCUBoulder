@@ -69,7 +69,7 @@ def QuestionOne(con):
     :return:
     """
 
-    SQL ="""select first_name, last_name, m.major_name, d.department_name department from student s
+    SQL ="""select first_name, last_name, m.major_name from student s
     join student_major sm on s.id = sm.student_id
     join major m on m.id = sm.major_id
     join department d on d.id = m.department_id
