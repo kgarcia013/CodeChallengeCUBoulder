@@ -1,6 +1,8 @@
 import yaml
 import pandas as pd
 import sqlite3
+import csv
+import copy
 
 
 
@@ -68,6 +70,7 @@ def CreateMajorsDict(con):
 
 
 def CreateDepartmentDict(con):
+
     SQL = """select id, department_name from department"""
 
     department_df = pd.read_sql_query(SQL, con)
@@ -101,6 +104,15 @@ def QuestionOne(con):
 
 def QuestionTwo(con, majors_dict,  department_dict):
 
+    """
+
+    :param con:
+    :param majors_dict:
+    :param department_dict:
+    :return:
+
+    """
+
     def StudentsPerMajor(con):
         SQL = """select m.id, m.major_name, count(*) as 'students_per_major' from student s
         left join student_major sm on s.id = sm.student_id
@@ -117,8 +129,6 @@ def QuestionTwo(con, majors_dict,  department_dict):
             major_name = value
 
             result = question_two_df.isin([major_name]).any().any()
-
-            print(str(result))
 
             if str(result) == 'False':
                 temp_df = {'id': major_id, 'major_name': major_name, 'students_per_major': 0}
@@ -147,8 +157,6 @@ def QuestionTwo(con, majors_dict,  department_dict):
 
             result = question_two_df.isin([department_name]).any().any()
 
-            print(str(result))
-
             if str(result) == 'False':
                 temp_df = {'id': department_id, 'department_name': department_name, 'students_per_department': 0}
                 question_two_df = question_two_df.append(temp_df, ignore_index=True)
@@ -158,6 +166,38 @@ def QuestionTwo(con, majors_dict,  department_dict):
 
     StudentsPerMajor(con)
     StudentsPerDepartment(con)
+
+
+def Question3(con):
+
+    """
+    Takes a query from sqlite and inserts rows into csv file using the csv module
+    :param con:
+    :return:
+
+    """
+
+    student_list = []
+
+    headers = ['StudentID', 'FirstName', 'LastName', 'DOB', 'MajorID', 'MajorName', 'DepartmentID']
+
+    student_list.append(headers)
+
+    SQL = """select s.id as 'student_id', first_name, last_name, dob, m.id AS 'Major_id', major_name, department_id, department_name  from student s
+    left join student_major sm on s.id = sm.student_id
+    left join major m on m.id = sm.major_id
+    left join department d on d.id =  m.department_id"""
+
+    cursor = con.cursor()
+    cursor.execute(SQL)
+
+    student_data = cursor.fetchall()
+
+    for row in student_data:
+        student_list.append(row)
+
+    question_three_output = csv.writer(open('question_three.csv', 'w', newline=''), delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    question_three_output.writerows(student_list)
 
 
 def main():
@@ -174,6 +214,7 @@ def main():
 
     QuestionOne(con)
     QuestionTwo(con, majors_dict,  department_dict)
+    Question3(con)
 
 
 if __name__ == "__main__":
