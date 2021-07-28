@@ -60,6 +60,12 @@ def InsertNewStudentRecord(newstudents, con):
 
 
 def CreateMajorsDict(con):
+    """
+    Creates a Dictionary of Majors using pandas.
+    The Sqlite Query is stored in a pandas dataframe and then converted to a dictionary
+    :param con:
+    :return department_dict:
+    """
     SQL = """select id, major_name from major"""
 
     majors_df = pd.read_sql_query(SQL, con)
@@ -70,6 +76,13 @@ def CreateMajorsDict(con):
 
 
 def CreateDepartmentDict(con):
+    """
+    Creates a Dictionary of Departments using pandas.
+    The Sqlite Query is stored in a pandas dataframe and then converted to a dictionary
+    :param con:
+    :return department_dict:
+
+    """
 
     SQL = """select id, department_name from department"""
 
@@ -114,6 +127,17 @@ def QuestionTwo(con, majors_dict,  department_dict):
     """
 
     def StudentsPerMajor(con):
+        """
+        Queries SQLite to Grab the number of students per major. The output is  then stored in a pandas dataframe.
+
+        In order to get the majors that didn't have any students, I compared the the dataframe to the majors_dict and stored the remaining majors into the dataframe.
+
+        Dataframe is then outputted into a csv file.
+
+        :param con:
+        :return:
+
+        """
         SQL = """select m.id, m.major_name, count(*) as 'students_per_major' from student s
         left join student_major sm on s.id = sm.student_id
         left join major m on m.id = sm.major_id
@@ -138,6 +162,16 @@ def QuestionTwo(con, majors_dict,  department_dict):
         question_two_df.to_csv('question_two_output_student_per_major.csv', index=False)
 
     def StudentsPerDepartment(con):
+        """
+        Queries SQLite to Grab the number of students per Department. The output is  then stored in a pandas dataframe.
+
+        In order to get the Departments that didn't have any students, I compared the the dataframe to the department_dict and stored the remaining majors into the dataframe.
+
+        Dataframe is then outputted into a csv file.
+
+        :param con:
+        :return:
+        """
 
         SQL = """select d.id, d.department_name, count(*) as 'students_per_department' from student s
         left join student_major sm on s.id = sm.student_id
@@ -167,11 +201,11 @@ def QuestionTwo(con, majors_dict,  department_dict):
     StudentsPerMajor(con)
     StudentsPerDepartment(con)
 
-
-def Question3(con):
+def QuestionThree(con):
 
     """
-    Takes a query from sqlite and inserts rows into csv file using the csv module
+    Takes a query from sqlite and inserts rows into csv file using the csv module.
+
     :param con:
     :return:
 
@@ -199,22 +233,28 @@ def Question3(con):
     question_three_output = csv.writer(open('question_three.csv', 'w', newline=''), delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
     question_three_output.writerows(student_list)
 
+def Question4(con):
+    pass
 
 def main():
     con = sqlite3.connect("student_major.db")
 
-    """
-    Insert New Student Records from Yaml File Provided in newstudent.yaml
-    """
+    #Insert New Student Records from Yaml File Provided in newstudent.yaml
+
     # newstudents = yaml.load(open('.\\newstudent.yaml', 'r'))
     # InsertNewStudentRecord(newstudents, con)
 
     majors_dict = CreateMajorsDict(con)
     department_dict = CreateDepartmentDict(con)
 
+    #Question One Solution
     QuestionOne(con)
+    #Question Two Solution
     QuestionTwo(con, majors_dict,  department_dict)
-    Question3(con)
+    #Question Three Soution
+    QuestionThree(con)
+    #Question Four Solution
+    Question4(con)
 
 
 if __name__ == "__main__":
