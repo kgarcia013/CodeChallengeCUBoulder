@@ -57,6 +57,25 @@ def InsertNewStudentRecord(newstudents, con):
         con.commit()
 
 
+def CreateMajorsDict(con):
+    SQL = """select id, major_name from major"""
+
+    majors_df = pd.read_sql_query(SQL, con)
+    majors_df = majors_df.set_index('id')
+    majors_dict = majors_df.to_dict()
+
+    return majors_dict
+
+
+def CreateDepartmentDict(con):
+    SQL = """select id, department_name from department"""
+
+    department_df = pd.read_sql_query(SQL, con)
+    department_df = department_df.set_index('id')
+    department_dict = department_df.to_dict()
+
+    return department_dict
+
 def QuestionOne(con):
     """
     This is the solution to question one.
@@ -80,24 +99,66 @@ def QuestionOne(con):
     question_one_df.to_csv('question_one_output.csv', index=False)
 
 
-def Question2_StudentsPerMajor(con):
-    SQL = """select m.id, m.major_name, count(*) from student s
-    left join student_major sm on s.id = sm.student_id
-    left join major m on m.id = sm.major_id
-    group by  m.id"""
+def QuestionTwo(con, majors_dict,  department_dict):
 
-    question_two_df = pd.read_sql_query(SQL, con)
+    def StudentsPerMajor(con):
+        SQL = """select m.id, m.major_name, count(*) as 'students_per_major' from student s
+        left join student_major sm on s.id = sm.student_id
+        left join major m on m.id = sm.major_id
+        group by  m.id"""
 
-def Question2_StudentsPerDepartment(con):
+        question_two_df = pd.read_sql_query(SQL, con)
+        question_two_df['id'] = question_two_df['id'].fillna(0)
+        question_two_df['id'] = question_two_df['id'].astype(int)
+        question_two_df = question_two_df.replace([None], 'Students with No Major')
 
-    SQL = """select d.id, d.department_name, count(*) from student s
-    left join student_major sm on s.id = sm.student_id
-    left join major m on m.id = sm.major_id
-    left join department d on d.id = m.department_id
-    group by  d.id
-    """
+        for key, value in majors_dict['major_name'].items():
+            major_id = int(key)
+            major_name = value
 
-    question_two_df = pd.read_sql_query(SQL, con)
+            result = question_two_df.isin([major_name]).any().any()
+
+            print(str(result))
+
+            if str(result) == 'False':
+                temp_df = {'id': major_id, 'major_name': major_name, 'students_per_major': 0}
+                question_two_df = question_two_df.append(temp_df, ignore_index=True)
+
+
+        question_two_df.to_csv('question_two_output_student_per_major.csv', index=False)
+
+    def StudentsPerDepartment(con):
+
+        SQL = """select d.id, d.department_name, count(*) as 'students_per_department' from student s
+        left join student_major sm on s.id = sm.student_id
+        left join major m on m.id = sm.major_id
+        left join department d on d.id = m.department_id
+        group by  d.id
+        """
+
+        question_two_df = pd.read_sql_query(SQL, con)
+        question_two_df['id'] = question_two_df['id'].fillna(0)
+        question_two_df['id'] = question_two_df['id'].astype(int)
+        question_two_df = question_two_df.replace([None], 'No Department Found')
+
+        for key, value in department_dict['department_name'].items():
+            department_id = int(key)
+            department_name = value
+
+            result = question_two_df.isin([department_name]).any().any()
+
+            print(str(result))
+
+            if str(result) == 'False':
+                temp_df = {'id': department_id, 'department_name': department_name, 'students_per_department': 0}
+                question_two_df = question_two_df.append(temp_df, ignore_index=True)
+
+
+        question_two_df.to_csv('question_two_output_student_per_dept.csv', index=False)
+
+    StudentsPerMajor(con)
+    StudentsPerDepartment(con)
+
 
 def main():
     con = sqlite3.connect("student_major.db")
@@ -108,8 +169,11 @@ def main():
     # newstudents = yaml.load(open('.\\newstudent.yaml', 'r'))
     # InsertNewStudentRecord(newstudents, con)
 
-    QuestionOne(con)
+    majors_dict = CreateMajorsDict(con)
+    department_dict = CreateDepartmentDict(con)
 
+    QuestionOne(con)
+    QuestionTwo(con, majors_dict,  department_dict)
 
 
 if __name__ == "__main__":
