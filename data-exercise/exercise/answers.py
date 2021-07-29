@@ -60,7 +60,8 @@ def InsertNewStudentRecord(newstudents, max_student,con):
 
         insert_student_sql = "INSERT INTO student (id, first_name, last_name, dob) values ({0}, '{1}', '{2}', '{3}' )".format(student_id, first_name, last_name, dob)
         cursor.execute(insert_student_sql)
-        print(insert_student_sql)
+
+        max_student = max_student + 1
 
         con.commit()
 
@@ -357,20 +358,20 @@ def main():
     max_student_major = GetMaxStudentMajor(con)
     max_student = GetMaxStudent(con)
 
-    # newstudents = yaml.load(open('.\\newstudent.yaml', 'r'))
-    # InsertNewStudentRecord(newstudents, max_student,con)
+    newstudents = yaml.load(open('.\\newstudent.yaml', 'r'), yaml.FullLoader)
+    InsertNewStudentRecord(newstudents, max_student,con)
 
-    majors_dict = CreateMajorsDict(con)
-    department_dict = CreateDepartmentDict(con)
-
-    #Question One Solution
-    QuestionOne(con)
-    #Question Two Solution
-    QuestionTwo(con, majors_dict,  department_dict)
-    #Question Three Soution
-    QuestionThree(con)
-    #Question Four Solution
-    Question4(max_student, max_student_major, con)
+    # majors_dict = CreateMajorsDict(con)
+    # department_dict = CreateDepartmentDict(con)
+    #
+    # #Question One Solution
+    # QuestionOne(con)
+    # #Question Two Solution
+    # QuestionTwo(con, majors_dict,  department_dict)
+    # #Question Three Soution
+    # QuestionThree(con)
+    # #Question Four Solution
+    # Question4(max_student, max_student_major, con)
 
 
 if __name__ == "__main__":
