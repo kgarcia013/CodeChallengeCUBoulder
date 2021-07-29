@@ -10,9 +10,8 @@
 
 1. Run ``` python create_db.py ``` to create your SQLite Database student_major.db
 2. Open answers.py
-3. Uncomment lines 360 and 361 and make sure to 
-4. Comment Out Lines 366-373 to prevent Question/Solution functions from being run at the same time
-5. run ``` python answers.py```
+3. Set the variable **InsertNewStudents**  in main() to True
+4. run ``` python answers.py```
 
 
 **newstudent.yaml file is provided to insert new student records into the database. Examples are provided. **  
@@ -21,5 +20,5 @@
 ### Project Instructions:
 
 1. Run ``` python create_db.py ``` to create your SQLite Database student_major.db
-2. Comment out lines 360 and 361 and make sure Lines 366-373 are uncommented
+2. Set the variable **InsertNewStudents**  in main() to False
 3. run ``` python answers.py```

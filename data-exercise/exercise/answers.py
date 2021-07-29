@@ -111,12 +111,12 @@ def QuestionOne(con):
     :return:
     """
 
-    SQL ="""select first_name, last_name, m.major_name from student s
+    SQL ="""select s.id, first_name, last_name, m.major_name from student s
     join student_major sm on s.id = sm.student_id
     join major m on m.id = sm.major_id
     join department d on d.id = m.department_id
     where department_name in ('Engineering', 'Language Arts')
-    order by last_name"""
+    order by s.id"""
 
     question_one_df = pd.read_sql_query(SQL, con)
     question_one_df.to_csv('question_one_output.csv', index=False)
@@ -237,7 +237,7 @@ def QuestionThree(con):
     SQL = """select s.id as 'student_id', first_name, last_name, dob, m.id AS 'Major_id', major_name  from student s
     left join student_major sm on s.id = sm.student_id
     left join major m on m.id = sm.major_id
-    left join department d on d.id =  m.department_id"""
+	group by s.id , m.id"""
 
     cursor = con.cursor()
     cursor.execute(SQL)
@@ -351,6 +351,8 @@ def Question4(max_student, max_student_major, con):
     StudentMajorsTable(student_data_df, max_student_major, old_id_to_new_id)
 
 def main():
+
+    InsertNewStudents = False
     con = sqlite3.connect("student_major.db")
 
     #Insert New Student Records from Yaml File Provided in newstudent.yaml
@@ -358,20 +360,23 @@ def main():
     max_student_major = GetMaxStudentMajor(con)
     max_student = GetMaxStudent(con)
 
-    newstudents = yaml.load(open('.\\newstudent.yaml', 'r'), yaml.FullLoader)
-    InsertNewStudentRecord(newstudents, max_student,con)
+    if InsertNewStudents is True:
 
-    # majors_dict = CreateMajorsDict(con)
-    # department_dict = CreateDepartmentDict(con)
-    #
-    # #Question One Solution
-    # QuestionOne(con)
-    # #Question Two Solution
-    # QuestionTwo(con, majors_dict,  department_dict)
-    # #Question Three Soution
-    # QuestionThree(con)
-    # #Question Four Solution
-    # Question4(max_student, max_student_major, con)
+        newstudents = yaml.load(open('newstudent.yaml', 'r'), yaml.FullLoader)
+        InsertNewStudentRecord(newstudents, max_student,con)
+
+    else:
+        majors_dict = CreateMajorsDict(con)
+        department_dict = CreateDepartmentDict(con)
+
+        #Question One Solution
+        QuestionOne(con)
+        #Question Two Solution
+        QuestionTwo(con, majors_dict,  department_dict)
+        #Question Three Soution
+        QuestionThree(con)
+        #Question Four Solution
+        Question4(max_student, max_student_major, con)
 
 
 if __name__ == "__main__":
