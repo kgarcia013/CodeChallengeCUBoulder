@@ -3,7 +3,6 @@ import pandas as pd
 import sqlite3
 import csv
 import copy
-import numpy
 
 
 def GetMaxStudent(con):
