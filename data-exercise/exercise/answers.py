@@ -116,7 +116,7 @@ def QuestionOne(con):
     join major m on m.id = sm.major_id
     join department d on d.id = m.department_id
     where department_name in ('Engineering', 'Language Arts')
-    order by s.id"""
+    order by last_name ASC"""
 
     question_one_df = pd.read_sql_query(SQL, con)
     question_one_df.to_csv('question_one_output.csv', index=False)
